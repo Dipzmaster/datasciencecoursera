@@ -1,0 +1,4 @@
+Follow this link for more information on preprocessing with caret.
+https://topepo.github.io/caret/pre-processing.html
+
+https://datascience.study.foletta.org/C8_Practical_Machine_Learning/w4_notes.html

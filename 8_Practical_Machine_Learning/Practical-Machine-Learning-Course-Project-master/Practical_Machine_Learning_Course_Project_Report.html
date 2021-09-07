@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Carlos Schuler" />
+
+
+<title>Practical Machine Learning Course Project</title>
+
+<script src="Practical_Machine_Learning_Course_Project_Report_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="Practical_Machine_Learning_Course_Project_Report_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="Practical_Machine_Learning_Course_Project_Report_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="Practical_Machine_Learning_Course_Project_Report_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="Practical_Machine_Learning_Course_Project_Report_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="Practical_Machine_Learning_Course_Project_Report_files/navigation-1.1/tabsets.js"></script>
+<link href="Practical_Machine_Learning_Course_Project_Report_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="Practical_Machine_Learning_Course_Project_Report_files/highlightjs-9.12.0/highlight.js"></script>
+<script src="Practical_Machine_Learning_Course_Project_Report_files/kePrint-0.0.1/kePrint.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Practical Machine Learning Course Project</h1>
+<h4 class="author">Carlos Schuler</h4>
+
+</div>
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><a href="http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/work.jsf?p1=11201">Velloso et al.</a> asked six volunteers to perform barbell lifts (correctly and incorrectly) in 5 different ways. Accelerometer data was collected on the belt, forearm, arm, and dumbell during the exercises.</p>
+<p>This report presents an exploration of machine learning models to predict the manner in which the subjects performed the exercise, including:</p>
+<ul>
+<li>How the models are built and why</li>
+<li>The cross-validation strategy</li>
+<li>An estimation of the expected out of sample error for the selected model</li>
+<li>A prediction using the model of 20 different test cases for which only the accelerometer data is provided</li>
+</ul>
+</div>
+<div id="data-source" class="section level2">
+<h2>Data Source</h2>
+<p>Data from <a href="http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/work.jsf?p1=11201">Velloso et al.</a> to build the model was downloaded from: <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a></p>
+<p>In this dataset, the manner in which the subjects performed the exercise is coded in the <em>classe</em> variable.</p>
+<p>Data for which predictions will be performed for the cases downloaded from this location: <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a></p>
+</div>
+<div id="packages-used" class="section level2">
+<h2>Packages Used</h2>
+<pre class="r"><code>library(tidyverse)
+library(corrplot)
+library(caret)
+library(lares)</code></pre>
+</div>
+<div id="download-and-read-the-data" class="section level2">
+<h2>Download and Read the Data</h2>
+<p>The data to build and cross-validate the model is stored in the <em>learn</em> data frame. Likewise, the 20 test cases to be predicted using the final model are saved into the <em>evaluate</em> data frame.</p>
+<pre class="r"><code>learnFile &lt;- &quot;training.csv&quot;
+learnUrl &lt;- &quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;
+download.file(learnUrl,learnFile)
+learn &lt;- as_tibble(read.csv(learnFile))
+dim(learn)</code></pre>
+<pre><code>## [1] 19622   160</code></pre>
+<pre class="r"><code>evaluateFile &lt;- &quot;testing.csv&quot;
+evaluateUrl &lt;- &quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv&quot;
+download.file(evaluateUrl,evaluateFile)
+evaluate &lt;- as_tibble(read.csv(evaluateFile))
+dim(evaluate)</code></pre>
+<pre><code>## [1]  20 160</code></pre>
+</div>
+<div id="data-clean-up" class="section level2">
+<h2>Data Clean-up</h2>
+<p>The column names are harmonized between the two data sets, NA columns, and columns with no useful information for exercise classification are removed in the code below:</p>
+<pre class="r"><code># Find columns named differently in train and test set and make them the same
+difNames &lt;- which(names(evaluate)!=names(learn))
+cat(paste(&quot;Column indices with names that are different:&quot;, difNames, &quot;\nWill use names from &#39;learn&#39; data frame&quot;))</code></pre>
+<pre><code>## Column indices with names that are different: 160 
+## Will use names from &#39;learn&#39; data frame</code></pre>
+<pre class="r"><code>names(evaluate)[difNames] &lt;- names(learn)[difNames]
+
+# Make classe a factor
+learn$classe &lt;- factor(learn$classe)
+evaluate$classe &lt;- factor(evaluate$classe)
+
+# Eliminate the first 7 columns of both datasets - they contain no useful training data
+learn &lt;- learn %&gt;% select(-(1:7))
+evaluate &lt;- evaluate %&gt;% select(-(1:7))
+
+# Find columns in the evaluate dataset that contain only NA and remove them
+naColumns &lt;- names(which(apply(evaluate,2, function(x) all(is.na(x)))))
+useColumns &lt;- names(evaluate)[!(names(evaluate) %in% naColumns)]
+
+evaluate &lt;- evaluate[,useColumns]
+learn &lt;- learn[,useColumns]
+
+# Check that no NA&#39;s are left in either dataset
+if(length(names(which(apply(evaluate,2, function(x) any(is.na(x)))))==&quot;&quot;)==0) cat(&quot;No NA in &#39;evaluate&#39;&quot;)</code></pre>
+<pre><code>## No NA in &#39;evaluate&#39;</code></pre>
+<pre class="r"><code>if(length(names(which(apply(learn,2, function(x) any(is.na(x)))))==&quot;&quot;)==0) cat(&quot;No NA in &#39;learn&#39;&quot;)</code></pre>
+<pre><code>## No NA in &#39;learn&#39;</code></pre>
+</div>
+<div id="data-partitioning" class="section level2">
+<h2>Data partitioning</h2>
+<p>The data is split into <em>training</em>, <em>testing</em> and <em>validation</em> data frames, using <em>createDataPartition()</em>:</p>
+<pre class="r"><code># Split the learn dataset into a training, a testing and a validation datasets
+set.seed(1234)
+inBuild &lt;- createDataPartition(learn$classe, p = 3/4)[[1]]
+validation &lt;- learn[-inBuild,]
+buildData &lt;- learn[inBuild,]
+
+inTrain = createDataPartition(buildData$classe, p = 3/4)[[1]]
+training = buildData[ inTrain,]
+testing = buildData[-inTrain,]
+
+dim(training)</code></pre>
+<pre><code>## [1] 11040    53</code></pre>
+<pre class="r"><code>dim(testing)</code></pre>
+<pre><code>## [1] 3678   53</code></pre>
+<pre class="r"><code>dim(validation)</code></pre>
+<pre><code>## [1] 4904   53</code></pre>
+</div>
+<div id="dimension-reduction" class="section level2">
+<h2>Dimension Reduction</h2>
+<p>Near-zero variance columns are eliminated using <em>nearZeroVar()</em>, and highly correlated (&gt;90%) columns are identified using <em>findCorrelation()</em> and then eliminated:</p>
+<pre class="r"><code># Are there columns with near-zero variance in training?  If yes, remove them
+nearZeroVariance &lt;- nearZeroVar(training)
+if(length(nearZeroVariance)==0) {
+        print(&quot;No near-zero-variance columns in training&quot;)
+} else {
+        print(&quot;Removing near-zero-variance columns:&quot;)
+        print(nearZeroVariance)
+        training &lt;- training[,-nearZeroVariance]
+        testing &lt;- testing[,-nearZeroVariance]
+        validation &lt;- validation[,-nearZeroVar]
+        evaluate &lt;- evaluate[,-nearZeroVariance]
+}</code></pre>
+<pre><code>## [1] &quot;No near-zero-variance columns in training&quot;</code></pre>
+<pre class="r"><code># Are there highly correlated columns?  If yes, remove them
+corrM &lt;- cor(select(training, -classe))
+diag(corrM)&lt;-0
+corrplot(corrM, method=&quot;circle&quot;,tl.cex=0.6)</code></pre>
+<p><img src="Practical_Machine_Learning_Course_Project_Report_files/figure-html/dimReduction-1.png" /><!-- --></p>
+<pre class="r"><code>highCorr &lt;- findCorrelation(corrM, cutoff = 0.9)
+if(length(highCorr)==0) {
+        print(&quot;No highly correlated columns in &#39;training&#39;&quot;)
+} else {
+        cat( paste(&quot;Removing&quot;, length(highCorr), &quot;highly correlated columns:\n&quot;))
+        print(names(training)[highCorr])
+        training &lt;- training[,-highCorr]
+        testing &lt;- testing[,-highCorr]
+        validation &lt;- validation[,-highCorr]
+        evaluate &lt;- evaluate[,-highCorr]
+}</code></pre>
+<pre><code>## Removing 7 highly correlated columns:
+## [1] &quot;accel_belt_z&quot;     &quot;roll_belt&quot;        &quot;accel_belt_y&quot;     &quot;accel_belt_x&quot;    
+## [5] &quot;gyros_dumbbell_x&quot; &quot;gyros_dumbbell_z&quot; &quot;gyros_arm_x&quot;</code></pre>
+<pre class="r"><code>dim(training)</code></pre>
+<pre><code>## [1] 11040    46</code></pre>
+<pre class="r"><code>dim(testing)</code></pre>
+<pre><code>## [1] 3678   46</code></pre>
+<pre class="r"><code>dim(validation)</code></pre>
+<pre><code>## [1] 4904   46</code></pre>
+</div>
+<div id="model-creation" class="section level2">
+<h2>Model Creation</h2>
+<p>Five different models are created using the <em>training</em> dataset. Default values for <em>trainControl()</em> are used: 25 bootstrap resamples of the training data (with replacement) and parameter tuning for each of the modeling approaches (for example, <em>mtry</em> for Random Forest):</p>
+<pre class="r"><code># Build five models
+trainctrl &lt;- trainControl(verboseIter = FALSE) #Toggle to TRUE to monitor iterations
+
+modelRF &lt;- train(classe~., method=&quot;rf&quot;, data=training, trControl=trainctrl) #Random Forest
+modelGBM &lt;- train(classe~., method=&quot;gbm&quot;, data=training, verbose=FALSE, trControl=trainctrl) #Gradient Boosting Machine
+modelRPART &lt;- train(classe~., method=&quot;rpart&quot;, data=training, trControl=trainctrl) #CART
+modelTreebag &lt;- train(classe~., method=&quot;treebag&quot;, data=training, trControl=trainctrl) #Bagged CART
+modelLDA &lt;- train(classe~., method=&quot;lda&quot;, data=training, trControl=trainctrl) #Linear Discriminant Analysis</code></pre>
+</div>
+<div id="model-evaluation-against-testing-set" class="section level2">
+<h2>Model Evaluation against <em>Testing</em> Set</h2>
+<pre class="r"><code># Evaluate the models
+predRF &lt;- predict(modelRF, testing); cmRF &lt;- confusionMatrix(predRF,testing$classe)
+predGBM &lt;- predict(modelGBM, testing); cmGBM &lt;- confusionMatrix(predGBM,testing$classe)
+predRPART &lt;- predict(modelRPART, testing); cmRPART &lt;- confusionMatrix(predRPART,testing$classe)
+predTreebag &lt;- predict(modelTreebag, testing); cmTreebag &lt;- confusionMatrix(predTreebag,testing$classe)
+predLDA &lt;- predict(modelLDA, testing); cmLDA &lt;- confusionMatrix(predLDA,testing$classe)
+
+accuracy &lt;- data.frame(Random_Forest=cmRF$overall[1], Gradient_Boost=cmGBM$overall[1],
+                      CART=cmRPART$overall[1], Tree_Bag=cmTreebag$overall[1],
+                      LDA=cmLDA$overall[1])
+knitr::kable(accuracy, &quot;html&quot;, 
+                       col.names=c(&quot;Random Forest&quot;,&quot;Gradient Boost&quot;,&quot;CART&quot;,
+                                   &quot;Tree with Bagging&quot;,&quot;LDA&quot;),
+                       align=c(&quot;c&quot;,&quot;c&quot;,&quot;c&quot;,&quot;c&quot;,&quot;c&quot;)) %&gt;% 
+        kableExtra::kable_styling(bootstrap_options = c(&quot;hover&quot;), 
+                                  full_width = F, position=&quot;center&quot;)</code></pre>
+<table class="table table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+Random Forest
+</th>
+<th style="text-align:center;">
+Gradient Boost
+</th>
+<th style="text-align:center;">
+CART
+</th>
+<th style="text-align:center;">
+Tree with Bagging
+</th>
+<th style="text-align:center;">
+LDA
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Accuracy
+</td>
+<td style="text-align:center;">
+0.9921153
+</td>
+<td style="text-align:center;">
+0.9611202
+</td>
+<td style="text-align:center;">
+0.5002719
+</td>
+<td style="text-align:center;">
+0.9820555
+</td>
+<td style="text-align:center;">
+0.6791735
+</td>
+</tr>
+</tbody>
+</table>
+<p>Given the complexity of the data, it is not surprising that “simple” classifiers, such as CART (Classification and Regression Trees) and LDA (Linear Discriminant Analysis) perform poorly. They are thus, dropped out from further consideration.</p>
+<p>On the other hand, more complex classifiers perform quite well, all with accuracy &gt; 95%.</p>
+</div>
+<div id="stacked-model-creation" class="section level2">
+<h2>Stacked Model Creation</h2>
+<p>A stacked model can be created using using the testing data and the predictions of the above Random Forest, Gradient Boost and Tree with Bagging models:</p>
+<pre class="r"><code>predDataFrame &lt;- data.frame(predRF, 
+                            predGBM, 
+                            predTreebag, 
+                            classe=testing$classe)
+modelCombined &lt;- train(classe~.,model=&quot;rf&quot;, data=predDataFrame,trControl=trainctrl)</code></pre>
+</div>
+<div id="model-evaluation-against-the-validation-set" class="section level2">
+<h2>Model Evaluation against the <em>Validation</em> Set</h2>
+<p>The stacked model and its three parent models are evaluated against the <em>validation</em> data set:</p>
+<pre class="r"><code># Evaluate on the validation dataset
+vpredRF &lt;- predict(modelRF, validation); vcmRF &lt;- confusionMatrix(vpredRF,validation$classe)
+vpredGBM &lt;- predict(modelGBM, validation); vcmGBM &lt;- confusionMatrix(vpredGBM,validation$classe)
+vpredTreebag &lt;- predict(modelTreebag, validation); vcmTreebag &lt;- confusionMatrix(vpredTreebag,validation$classe)
+
+vpredDataFrame &lt;- data.frame(predRF=vpredRF,
+                             predGBM=vpredGBM,
+                             predTreebag=vpredTreebag)
+vpredCombined &lt;- predict(modelCombined,vpredDataFrame); vcmCombined &lt;- confusionMatrix(vpredCombined,validation$classe)
+
+vaccuracy &lt;- data.frame(Random_Forest=vcmRF$overall[1], Gradient_Boost=vcmGBM$overall[1],
+                     Tree_Bag=vcmTreebag$overall[1],
+                      Stacked=vcmCombined$overall[1])
+knitr::kable(vaccuracy, &quot;html&quot;, 
+                       col.names=c(&quot;Random Forest&quot;,&quot;Gradient Boost&quot;,
+                                   &quot;Tree with Bagging&quot;,&quot;Stacked&quot;),
+                       align=c(&quot;c&quot;,&quot;c&quot;,&quot;c&quot;,&quot;c&quot;,&quot;c&quot;)) %&gt;% 
+        kableExtra::kable_styling(bootstrap_options = c(&quot;hover&quot;), 
+                                  full_width = F, position=&quot;center&quot;)</code></pre>
+<table class="table table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+Random Forest
+</th>
+<th style="text-align:center;">
+Gradient Boost
+</th>
+<th style="text-align:center;">
+Tree with Bagging
+</th>
+<th style="text-align:center;">
+Stacked
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Accuracy
+</td>
+<td style="text-align:center;">
+0.9934747
+</td>
+<td style="text-align:center;">
+0.9588091
+</td>
+<td style="text-align:center;">
+0.9881729
+</td>
+<td style="text-align:center;">
+0.9932708
+</td>
+</tr>
+</tbody>
+</table>
+<p>The stacked model’s performace does not improve upon that of the Random Forest parent model.</p>
+</div>
+<div id="model-selection-and-predictions" class="section level2">
+<h2>Model Selection and Predictions</h2>
+<p>Based on the above results, the Random Forest model is selected to be used to predict the manner in which the subjects performed the exercise for the 20 unknown test cases.</p>
+<pre class="r"><code>epredRF &lt;- predict(modelRF, evaluate)
+predictions &lt;- as.data.frame(matrix(nrow=1,ncol=20))
+predictions[1,] &lt;- epredRF
+names(predictions) &lt;- 1:20
+knitr::kable(predictions, &quot;html&quot;, align=rep(&quot;c&quot;,times=20)) %&gt;% 
+        kableExtra::kable_styling(bootstrap_options = c(&quot;hover&quot;), 
+                                  full_width = F, position=&quot;center&quot;)</code></pre>
+<table class="table table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:center;">
+1
+</th>
+<th style="text-align:center;">
+2
+</th>
+<th style="text-align:center;">
+3
+</th>
+<th style="text-align:center;">
+4
+</th>
+<th style="text-align:center;">
+5
+</th>
+<th style="text-align:center;">
+6
+</th>
+<th style="text-align:center;">
+7
+</th>
+<th style="text-align:center;">
+8
+</th>
+<th style="text-align:center;">
+9
+</th>
+<th style="text-align:center;">
+10
+</th>
+<th style="text-align:center;">
+11
+</th>
+<th style="text-align:center;">
+12
+</th>
+<th style="text-align:center;">
+13
+</th>
+<th style="text-align:center;">
+14
+</th>
+<th style="text-align:center;">
+15
+</th>
+<th style="text-align:center;">
+16
+</th>
+<th style="text-align:center;">
+17
+</th>
+<th style="text-align:center;">
+18
+</th>
+<th style="text-align:center;">
+19
+</th>
+<th style="text-align:center;">
+20
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+B
+</td>
+<td style="text-align:center;">
+A
+</td>
+<td style="text-align:center;">
+B
+</td>
+<td style="text-align:center;">
+A
+</td>
+<td style="text-align:center;">
+A
+</td>
+<td style="text-align:center;">
+E
+</td>
+<td style="text-align:center;">
+D
+</td>
+<td style="text-align:center;">
+B
+</td>
+<td style="text-align:center;">
+A
+</td>
+<td style="text-align:center;">
+A
+</td>
+<td style="text-align:center;">
+B
+</td>
+<td style="text-align:center;">
+C
+</td>
+<td style="text-align:center;">
+B
+</td>
+<td style="text-align:center;">
+A
+</td>
+<td style="text-align:center;">
+E
+</td>
+<td style="text-align:center;">
+E
+</td>
+<td style="text-align:center;">
+A
+</td>
+<td style="text-align:center;">
+B
+</td>
+<td style="text-align:center;">
+B
+</td>
+<td style="text-align:center;">
+B
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="random-forest-model-assessment---out-of-sample-error" class="section level2">
+<h2>Random Forest Model Assessment - Out of Sample Error</h2>
+<p>As mentioned earlier, the Random Forest model was created using 25 bootstrap resamples of the training dataset. For each resample, three <em>mtry</em> values were evaluated. The <em>mtry</em> parameter value determines the number of variables available for splitting at each tree node in the forest; maximum accuracy was achieved with <em>mtry</em>=23 for the <em>training</em> dataset.</p>
+<pre class="r"><code>plot(modelRF)</code></pre>
+<p><img src="Practical_Machine_Learning_Course_Project_Report_files/figure-html/mtry-1.png" style="display: block; margin: auto;" /></p>
+<p>The confusion matrix for the Random Forest model applied to the <em>validation</em> dataset is shown below. The model has excellent sensitivity/specificity for every one manners the exercise was performed by the subjects.</p>
+<pre class="r"><code> mplot_conf(validation$classe,vpredRF)</code></pre>
+<p><img src="Practical_Machine_Learning_Course_Project_Report_files/figure-html/confusion-1.png" style="display: block; margin: auto;" /></p>
+<p>According to <a href="https://topepo.github.io/caret/variable-importance.html">Kuhn</a>, the <em>varImp()</em> function tracks the changes in model statistics for each predictor and accumulates the reduction in the statistic when each predictor’s feature is added to the model . This total reduction is used as the variable importance measure. For the training dataset, the relative variable importance is shown below.</p>
+<pre class="r"><code>vImp &lt;- varImp(modelRF)
+plot(vImp)</code></pre>
+<p><img src="Practical_Machine_Learning_Course_Project_Report_files/figure-html/vImp-1.png" style="display: block; margin: auto;" /></p>
+<p>Below, the scatter-plot matrix for the top five variables identified by <em>varImp()</em> is presented:</p>
+<pre class="r"><code>vImpDF&lt;-vImp$importance; top5 &lt;- rownames(vImpDF)[order(-vImpDF$Overall)][1:5]; reducedVal &lt;- validation[,top5]
+par(mfrow=c(1,1)); pairs(reducedVal, pch=19,cex=0.2, col=validation$classe, lower.panel=NULL)</code></pre>
+<p><img src="Practical_Machine_Learning_Course_Project_Report_files/figure-html/pairsPlot-1.png" style="display: block; margin: auto;" /></p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>Five classification approaches were considered to model rhe training data from <a href="http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/work.jsf?p1=11201">Velloso et al.</a> after dimensionality was reduced based on high variable correlation.</p>
+<p>Based on accuracy, the simpler classifier approaches: CART and LDA, performed poorly. More complex approaches: Random Forest, Gradient Boosting and Tree Bagging, performed very well. This may be attributed to the complex data clustering observed in the scatter-plot matrix.</p>
+<p>Random Forest was selected as the preferred modeling approach, its out-of-sample error was assessed against the validation dataset, and predictions were made for 20 unknown cases.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
